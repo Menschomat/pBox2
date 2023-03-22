@@ -1,0 +1,69 @@
+{
+  "mqtt": {
+    "broker": "mqtt.local",
+    "port": 1883,
+    "client_id": "pbox_manager",
+    "username": "mqtt_user",
+    "password": "some_pw",
+    "topic": "test"
+  },
+  "enclosure": {
+    "id": "enc_01",
+    "name": "Druckschrank",
+    "location": "Wohnzimmer",
+    "boxes": [
+      {
+        "id": "box_01",
+        "name": "Sapphire",
+        "location": "Fach 1",
+        "lights": [
+          {
+            "id": "light_01",
+            "name": "Arbeitslicht",
+            "type": "MONO"
+          }
+        ],
+        "fans": [
+          {
+            "id": "fan_01",
+            "name": "Lüftung"
+          }
+        ],
+        "sensors": [
+          {
+            "id": "temp_01",
+            "name": "Temp",
+            "type": "temp",
+            "unit": "c"
+          }
+        ]
+      },
+      {
+        "id": "box_02",
+        "name": "Ultimaker",
+        "location": "Fach 2",
+        "lights": [
+          {
+            "id": "led_01",
+            "name": "Arbeitslicht",
+            "type": "MONO"
+          }
+        ],
+        "fans": [
+          {
+            "id": "fan_01",
+            "name": "Lüftung"
+          }
+        ],
+        "sensors": [
+          {
+            "id": "temp_01",
+            "name": "Temp",
+            "type": "TEMP",
+            "unit": "c"
+          }
+        ]
+      }
+    ]
+  }
+}
