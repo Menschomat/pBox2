@@ -5,15 +5,6 @@ type Configuration struct {
 	Enclosure Enclosure `json:"enclosure"`
 }
 
-type Mqtt struct {
-	Broker   string `json:"broker"`
-	Port     int    `json:"port"`
-	ClientID string `json:"client_id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Topic    string `json:"topic"`
-}
-
 type Enclosure struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -34,15 +25,7 @@ type Fan struct {
 	Level      int        `json:"level"`
 	TimeSeries TimeSeries `json:"-"`
 }
-type Sensor struct {
-	ID         string     `json:"id"`
-	Name       string     `json:"name"`
-	Pin        int        `json:"pin"`
-	Type       SensorType `json:"type"`
-	Unit       string     `json:"unit"`
-	Target     int        `json:"target"`
-	TimeSeries TimeSeries `json:"-"`
-}
+
 type Box struct {
 	ID       string   `json:"id"`
 	Name     string   `json:"name"`
@@ -55,17 +38,3 @@ type TimeSeries struct {
 	Times  []string  `json:"times"`
 	Values []float32 `json:"values"`
 }
-
-type SensorType string
-
-const (
-	TEMP SensorType = "TEMP"
-)
-
-type LightType string
-
-const (
-	MONO LightType = "MONO"
-	//RGB    LightType = "RGB"
-	//WS2811 LightType = "WS2811"
-)

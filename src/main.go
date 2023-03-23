@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	api "github.com/Menschomat/pBox2/api"
 	m "github.com/Menschomat/pBox2/model"
 	u "github.com/Menschomat/pBox2/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -18,6 +20,7 @@ import (
 
 const CFG_PATH = "config.json"
 
+var cs = api.NewChatServer()
 var cfg = u.ParesConfig(CFG_PATH)
 var opts = u.GetBrokerOpts(cfg, messagePubHandler, connectHandler, connectLostHandler)
 var client = mqtt.NewClient(opts)
@@ -40,6 +43,22 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 			log.Println("HANDLING - SENSOR-EVENT:", sensor.ID)
 			if f64, err := strconv.ParseFloat(string(msg.Payload()), 32); err == nil {
 				go storeValueInTimeSeries(float32(f64), &sensor.TimeSeries)
+				sensorEvent, err := json.Marshal(
+					m.NewSensorEvent(
+						cfg.Enclosure.ID+"/"+box.ID,
+						m.SensorEventBody{
+							ID:   sensor.ID,
+							Unit: sensor.Unit, Type: sensor.Type,
+							Value: f64,
+							Time:  time.Now().Format(time.RFC3339),
+						},
+					),
+				)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				go cs.Publish(sensorEvent)
 			}
 		case "light":
 			log.Println("LIGHT")
@@ -134,6 +153,7 @@ func updateFan(w http.ResponseWriter, r *http.Request) {
 
 func getEnclosure(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	cs.Publish([]byte("TEST"))
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cfg.Enclosure)
 }
@@ -203,6 +223,7 @@ func main() {
 	//---------------
 	r.Get("/api/v1/{boxId}/sensors/{sensorId}", getSensor)
 	r.Get("/api/v1/{boxId}/sensors/{sensorId}/data", getSensorData)
+	r.Mount("/", cs)
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatalln("There's an error with the server", err)
