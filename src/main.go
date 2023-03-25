@@ -97,23 +97,10 @@ func sub(client mqtt.Client) {
 }
 
 func getLight(w http.ResponseWriter, r *http.Request) {
-	var boxId string = chi.URLParam(r, "boxId")
-	var lightId string = chi.URLParam(r, "lightId")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	var light m.Light
-
-	for idx := range cfg.Enclosure.Boxes {
-		if cfg.Enclosure.Boxes[idx].ID == boxId {
-			for _, l := range cfg.Enclosure.Boxes[idx].Lights {
-				if l.ID == lightId {
-					light = l
-					break
-				}
-			}
-			break
-		}
-	}
+	box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+	light := *u.FindLightById(chi.URLParam(r, "lightId"), &box)
 	if len(light.ID) <= 0 {
 		BadRequestError(w, r)
 	}
@@ -125,22 +112,10 @@ func updateLight(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFan(w http.ResponseWriter, r *http.Request) {
-	var boxId string = chi.URLParam(r, "boxId")
-	var fanID string = chi.URLParam(r, "fanId")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	var fan m.Fan
-	for _, b := range cfg.Enclosure.Boxes {
-		if b.ID == boxId {
-			for _, f := range b.Fans {
-				if f.ID == fanID {
-					fan = f
-					break
-				}
-			}
-			break
-		}
-	}
+	box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+	fan := *u.FindFanById(chi.URLParam(r, "fanId"), &box)
 	if len(fan.ID) <= 0 {
 		BadRequestError(w, r)
 	}
@@ -159,44 +134,20 @@ func getEnclosure(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSensorData(w http.ResponseWriter, r *http.Request) {
-	var boxId string = chi.URLParam(r, "boxId")
-	var sensorId string = chi.URLParam(r, "sensorId")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	var sensor m.Sensor
-	for _, b := range cfg.Enclosure.Boxes {
-		if b.ID == boxId {
-			for _, s := range b.Sensors {
-				if s.ID == sensorId {
-					sensor = s
-					break
-				}
-			}
-			break
-		}
-	}
+	box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+	sensor := *u.FindSensorById(chi.URLParam(r, "sensorId"), &box)
 	if len(sensor.ID) <= 0 {
 		BadRequestError(w, r)
 	}
 	json.NewEncoder(w).Encode(sensor.TimeSeries)
 }
 func getSensor(w http.ResponseWriter, r *http.Request) {
-	var boxId string = chi.URLParam(r, "boxId")
-	var sensorId string = chi.URLParam(r, "sensorId")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	var sensor m.Sensor
-	for _, b := range cfg.Enclosure.Boxes {
-		if b.ID == boxId {
-			for _, s := range b.Sensors {
-				if s.ID == sensorId {
-					sensor = s
-					break
-				}
-			}
-			break
-		}
-	}
+	box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+	sensor := *u.FindSensorById(chi.URLParam(r, "sensorId"), &box)
 	if len(sensor.ID) <= 0 {
 		BadRequestError(w, r)
 	}
@@ -209,7 +160,6 @@ func main() {
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-
 	log.Println("Spawning API")
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

@@ -30,3 +30,19 @@ func FindSensorById(id string, box *m.Box) *m.Sensor {
 	}
 	return &m.Sensor{}
 }
+func FindLightById(id string, box *m.Box) *m.Light {
+	for idx := range box.Lights {
+		if box.Lights[idx].ID == id {
+			return &box.Lights[idx]
+		}
+	}
+	return &m.Light{}
+}
+func FindFanById(id string, box *m.Box) *m.Fan {
+	for idx := range box.Fans {
+		if box.Fans[idx].ID == id {
+			return &box.Fans[idx]
+		}
+	}
+	return &m.Fan{}
+}
