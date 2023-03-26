@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"errors"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
@@ -13,8 +12,8 @@ import (
 	"nhooyr.io/websocket"
 )
 
-// ChatServer enables broadcasting to a set of subscribers.
-type ChatServer struct {
+// WebSocketServer enables broadcasting to a set of subscribers.
+type WebSocketServer struct {
 	// subscriberMessageBuffer controls the max number
 	// of messages that can be queued for a subscriber
 	// before it is kicked.
@@ -38,17 +37,15 @@ type ChatServer struct {
 	subscribers   map[*subscriber]struct{}
 }
 
-// NewChatServer constructs a chatServer with the defaults.
-func NewChatServer() *ChatServer {
-	cs := &ChatServer{
+// NewWebSocketServer constructs a chatServer with the defaults.
+func NewWebSocketServer() *WebSocketServer {
+	cs := &WebSocketServer{
 		subscriberMessageBuffer: 16,
 		logf:                    log.Printf,
 		subscribers:             make(map[*subscriber]struct{}),
 		publishLimiter:          rate.NewLimiter(rate.Every(time.Millisecond*100), 8),
 	}
 	cs.serveMux.HandleFunc("/subscribe", cs.SubscribeHandler)
-	cs.serveMux.HandleFunc("/publish", cs.publishHandler)
-
 	return cs
 }
 
@@ -60,13 +57,13 @@ type subscriber struct {
 	closeSlow func()
 }
 
-func (cs *ChatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (cs *WebSocketServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cs.serveMux.ServeHTTP(w, r)
 }
 
 // SubscribeHandler accepts the WebSocket connection and then subscribes
 // it to all future messages.
-func (cs *ChatServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
+func (cs *WebSocketServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: []string{"*"},
 	})
@@ -90,25 +87,6 @@ func (cs *ChatServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// publishHandler reads the request body with a limit of 8192 bytes and then publishes
-// the received message.
-func (cs *ChatServer) publishHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-	body := http.MaxBytesReader(w, r.Body, 8192)
-	msg, err := ioutil.ReadAll(body)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusRequestEntityTooLarge), http.StatusRequestEntityTooLarge)
-		return
-	}
-
-	cs.Publish(msg)
-
-	w.WriteHeader(http.StatusAccepted)
-}
-
 // subscribe subscribes the given WebSocket to all broadcast messages.
 // It creates a subscriber with a buffered msgs chan to give some room to slower
 // connections and then registers the subscriber. It then listens for all messages
@@ -117,7 +95,7 @@ func (cs *ChatServer) publishHandler(w http.ResponseWriter, r *http.Request) {
 //
 // It uses CloseRead to keep reading from the connection to process control
 // messages and cancel the context if the connection drops.
-func (cs *ChatServer) subscribe(ctx context.Context, c *websocket.Conn) error {
+func (cs *WebSocketServer) subscribe(ctx context.Context, c *websocket.Conn) error {
 	ctx = c.CloseRead(ctx)
 
 	s := &subscriber{
@@ -145,7 +123,7 @@ func (cs *ChatServer) subscribe(ctx context.Context, c *websocket.Conn) error {
 // Publish publishes the msg to all subscribers.
 // It never blocks and so messages to slow subscribers
 // are dropped.
-func (cs *ChatServer) Publish(msg []byte) {
+func (cs *WebSocketServer) Publish(msg []byte) {
 	cs.subscribersMu.Lock()
 	defer cs.subscribersMu.Unlock()
 
@@ -161,14 +139,14 @@ func (cs *ChatServer) Publish(msg []byte) {
 }
 
 // addSubscriber registers a subscriber.
-func (cs *ChatServer) addSubscriber(s *subscriber) {
+func (cs *WebSocketServer) addSubscriber(s *subscriber) {
 	cs.subscribersMu.Lock()
 	cs.subscribers[s] = struct{}{}
 	cs.subscribersMu.Unlock()
 }
 
 // deleteSubscriber deletes the given subscriber.
-func (cs *ChatServer) deleteSubscriber(s *subscriber) {
+func (cs *WebSocketServer) deleteSubscriber(s *subscriber) {
 	cs.subscribersMu.Lock()
 	delete(cs.subscribers, s)
 	cs.subscribersMu.Unlock()

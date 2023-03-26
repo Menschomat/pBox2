@@ -22,7 +22,7 @@ import (
 
 const CFG_PATH = "config.json"
 
-var cs = api.NewChatServer()
+var websocket = api.NewWebSocketServer()
 var cfg = u.ParesConfig(CFG_PATH)
 var opts = u.GetBrokerOpts(cfg, messagePubHandler, connectHandler, connectLostHandler)
 var client = mqtt.NewClient(opts)
@@ -60,7 +60,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 					fmt.Println(err)
 					return
 				}
-				go cs.Publish(sensorEvent)
+				go websocket.Publish(sensorEvent)
 			}
 		case "light":
 			log.Println("LIGHT")
@@ -181,7 +181,7 @@ func updateFan(w http.ResponseWriter, r *http.Request) {
 //	@Router			/enclosure [get]
 func getEnclosure(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	cs.Publish([]byte("TEST"))
+	websocket.Publish([]byte("TEST"))
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cfg.Enclosure)
 }
@@ -281,7 +281,7 @@ func main() {
 	r := router.NewRouter([]router.Route{})
 	r.Mount("/api/v1", r_api_v1)
 	r.Mount("/swagger", httpSwagger.WrapHandler)
-	r.Mount("/", cs)
+	r.Mount("/", websocket)
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatalln("There's an error with the server", err)
