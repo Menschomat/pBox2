@@ -1,0 +1,267 @@
+basePath: /api/v1
+definitions:
+  model.Box:
+    properties:
+      fans:
+        items:
+          $ref: '#/definitions/model.Fan'
+        type: array
+      id:
+        type: string
+      lights:
+        items:
+          $ref: '#/definitions/model.Light'
+        type: array
+      location:
+        type: string
+      name:
+        type: string
+      sensors:
+        items:
+          $ref: '#/definitions/model.Sensor'
+        type: array
+    type: object
+  model.Enclosure:
+    properties:
+      boxes:
+        items:
+          $ref: '#/definitions/model.Box'
+        type: array
+      id:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+    type: object
+  model.Fan:
+    properties:
+      id:
+        type: string
+      level:
+        type: integer
+      name:
+        type: string
+      pin:
+        type: integer
+    type: object
+  model.Light:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      pins:
+        items:
+          type: integer
+        type: array
+      state:
+        type: boolean
+      type:
+        $ref: '#/definitions/model.LightType'
+    type: object
+  model.LightType:
+    enum:
+    - MONO
+    type: string
+    x-enum-varnames:
+    - MONO
+  model.Sensor:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      pin:
+        type: integer
+      target:
+        type: integer
+      type:
+        $ref: '#/definitions/model.SensorType'
+      unit:
+        type: string
+    type: object
+  model.SensorType:
+    enum:
+    - TEMP
+    type: string
+    x-enum-varnames:
+    - TEMP
+  model.TimeSeries:
+    properties:
+      times:
+        items:
+          type: string
+        type: array
+      values:
+        items:
+          type: number
+        type: array
+    type: object
+info:
+  contact: {}
+  title: pBox2 API-Docs
+  version: "1.0"
+paths:
+  /{boxId}/fans/{fanId}:
+    get:
+      consumes:
+      - application/json
+      description: get fan by box- and fan-id
+      parameters:
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Fan ID
+        in: path
+        name: fanId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Fan'
+      summary: returns fan
+      tags:
+      - fan
+    post:
+      consumes:
+      - application/json
+      description: get fan by box- and fan-id
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Fan'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Fan'
+      summary: updates fan
+      tags:
+      - fan
+  /{boxId}/lights/{lightId}:
+    get:
+      consumes:
+      - application/json
+      description: get light by box- and light-id
+      parameters:
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Light ID
+        in: path
+        name: lightId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Light'
+      summary: returns light
+      tags:
+      - light
+    post:
+      consumes:
+      - application/json
+      description: get light by box- and light-id
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Light'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Light'
+      summary: updates light
+      tags:
+      - light
+  /{boxId}/sensors/{sensorId}:
+    get:
+      consumes:
+      - application/json
+      description: get sensor by box- and sensor-id
+      parameters:
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Sensor ID
+        in: path
+        name: sensorId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Sensor'
+      summary: returns sensor
+      tags:
+      - sensor
+  /{boxId}/sensors/{sensorId}/data:
+    get:
+      consumes:
+      - application/json
+      description: get sensor-data as time-series by box- and sensor-id
+      parameters:
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Sensor ID
+        in: path
+        name: sensorId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TimeSeries'
+      summary: returns sensor-data as time-series
+      tags:
+      - sensor
+  /enclosure:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Enclosure'
+      summary: returns whole enclosure
+      tags:
+      - enclosure
+swagger: "2.0"

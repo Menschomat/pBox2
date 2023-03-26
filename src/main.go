@@ -11,11 +11,13 @@ import (
 	"time"
 
 	api "github.com/Menschomat/pBox2/api"
+	_ "github.com/Menschomat/pBox2/docs"
 	m "github.com/Menschomat/pBox2/model"
+	router "github.com/Menschomat/pBox2/router"
 	u "github.com/Menschomat/pBox2/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 const CFG_PATH = "config.json"
@@ -96,6 +98,17 @@ func sub(client mqtt.Client) {
 	}
 }
 
+// GetFan godoc
+//
+//	@Summary		returns light
+//	@Description	get light by box- and light-id
+//	@Tags			light
+//	@Accept			json
+//	@Produce		json
+//	@Param			boxId	path		string	true	"Box ID"
+//	@Param			lightId	path		string	true	"Light ID"
+//	@Success		200		{object}	m.Light
+//	@Router			/{boxId}/lights/{lightId} [get]
 func getLight(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -107,10 +120,31 @@ func getLight(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(light)
 }
 
+// UpdateLight godoc
+//
+//	@Summary		updates light
+//	@Description	get light by box- and light-id
+//	@Tags			light
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		m.Light	true	"body"
+//	@Success		200		{object}	m.Light
+//	@Router			/{boxId}/lights/{lightId} [post]
 func updateLight(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetFan godoc
+//
+//	@Summary		returns fan
+//	@Description	get fan by box- and fan-id
+//	@Tags			fan
+//	@Accept			json
+//	@Produce		json
+//	@Param			boxId	path		string	true	"Box ID"
+//	@Param			fanId	path		string	true	"Fan ID"
+//	@Success		200		{object}	m.Fan
+//	@Router			/{boxId}/fans/{fanId} [get]
 func getFan(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -122,10 +156,29 @@ func getFan(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(fan)
 }
 
+// UpdateFan godoc
+//
+//	@Summary		updates fan
+//	@Description	get fan by box- and fan-id
+//	@Tags			fan
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		m.Fan	true	"body"
+//	@Success		200		{object}	m.Fan
+//	@Router			/{boxId}/fans/{fanId} [post]
 func updateFan(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetEnclosure godoc
+//
+//	@Summary		returns whole enclosure
+//	@Description	get string by ID
+//	@Tags			enclosure
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	m.Enclosure
+//	@Router			/enclosure [get]
 func getEnclosure(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	cs.Publish([]byte("TEST"))
@@ -133,6 +186,17 @@ func getEnclosure(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cfg.Enclosure)
 }
 
+// GetSensorData godoc
+//
+//	@Summary		returns sensor-data as time-series
+//	@Description	get sensor-data as time-series by box- and sensor-id
+//	@Tags			sensor
+//	@Accept			json
+//	@Produce		json
+//	@Param			boxId		path		string	true	"Box ID"
+//	@Param			sensorId	path		string	true	"Sensor ID"
+//	@Success		200			{object}	m.TimeSeries
+//	@Router			/{boxId}/sensors/{sensorId}/data [get]
 func getSensorData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -143,6 +207,18 @@ func getSensorData(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(sensor.TimeSeries)
 }
+
+// GetSensor godoc
+//
+//	@Summary		returns sensor
+//	@Description	get sensor by box- and sensor-id
+//	@Tags			sensor
+//	@Accept			json
+//	@Produce		json
+//	@Param			boxId		path		string	true	"Box ID"
+//	@Param			sensorId	path		string	true	"Sensor ID"
+//	@Success		200			{object}	m.Sensor
+//	@Router			/{boxId}/sensors/{sensorId} [get]
 func getSensor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -154,6 +230,9 @@ func getSensor(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sensor)
 }
 
+//	@title		pBox2 API-Docs
+//	@version	1.0
+//	@BasePath	/api/v1
 func main() {
 	log.Println("*_-_-_-pBox2-_-_-_*")
 	rand.Seed(time.Now().UnixNano())
@@ -161,18 +240,47 @@ func main() {
 		panic(token.Error())
 	}
 	log.Println("Spawning API")
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/api/v1/enclosure", getEnclosure)
-	//---------------
-	r.Get("/api/v1/{boxId}/lights/{lightId}", getLight)
-	r.Post("/api/v1/{boxId}/lights/{lightId}", updateLight)
-	//---------------
-	r.Get("/api/v1/{boxId}/fans/{fanId}", getFan)
-	r.Post("/api/v1/{boxId}/fans/{fanId}", updateFan)
-	//---------------
-	r.Get("/api/v1/{boxId}/sensors/{sensorId}", getSensor)
-	r.Get("/api/v1/{boxId}/sensors/{sensorId}/data", getSensorData)
+	var routes = []router.Route{
+		{
+			Method:      "GET",
+			Path:        "/enclosure",
+			HandlerFunc: getEnclosure,
+		},
+		{
+			Method:      "GET",
+			Path:        "/{boxId}/lights/{lightId}",
+			HandlerFunc: getLight,
+		},
+		{
+			Method:      "POST",
+			Path:        "/{boxId}/lights/{lightId}",
+			HandlerFunc: updateLight,
+		},
+		{
+			Method:      "GET",
+			Path:        "/{boxId}/fans/{fanId}",
+			HandlerFunc: getLight,
+		},
+		{
+			Method:      "POST",
+			Path:        "/{boxId}/fans/{fanId}",
+			HandlerFunc: updateLight,
+		},
+		{
+			Method:      "GET",
+			Path:        "/{boxId}/sensors/{sensorId}",
+			HandlerFunc: getSensor,
+		},
+		{
+			Method:      "GET",
+			Path:        "/{boxId}/sensors/{sensorId}/data",
+			HandlerFunc: getSensorData,
+		},
+	}
+	r_api_v1 := router.NewRouter(routes)
+	r := router.NewRouter([]router.Route{})
+	r.Mount("/api/v1", r_api_v1)
+	r.Mount("/swagger", httpSwagger.WrapHandler)
 	r.Mount("/", cs)
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
