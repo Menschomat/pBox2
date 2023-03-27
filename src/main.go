@@ -77,7 +77,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 func storeValueInTimeSeries(value float32, timeSeries *m.TimeSeries) {
 	timeSeries.Times = append(timeSeries.Times, time.Now().Format(time.RFC3339))
 	timeSeries.Values = append(timeSeries.Values, value)
-	if len(timeSeries.Times) > 10 {
+	if len(timeSeries.Times) > 200 {
 		timeSeries.Times = timeSeries.Times[1:]
 		timeSeries.Values = timeSeries.Values[1:]
 	}
@@ -230,9 +230,9 @@ func getSensor(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sensor)
 }
 
-//	@title		pBox2 API-Docs
-//	@version	1.0
-//	@BasePath	/api/v1
+// @title		pBox2 API-Docs
+// @version	1.0
+// @BasePath	/api/v1
 func main() {
 	log.Println("*_-_-_-pBox2-_-_-_*")
 	rand.Seed(time.Now().UnixNano())

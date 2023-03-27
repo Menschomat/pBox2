@@ -14,14 +14,13 @@ type Enclosure struct {
 type Light struct {
 	ID    string    `json:"id"`
 	Name  string    `json:"name"`
-	Pins  []int     `json:"pins"`
 	Type  LightType `json:"type"`
+	Level int       `json:"level"`
 	State bool      `json:"state"`
 }
 type Fan struct {
 	ID         string     `json:"id"`
 	Name       string     `json:"name"`
-	Pin        int        `json:"pin"`
 	Level      int        `json:"level"`
 	TimeSeries TimeSeries `json:"-"`
 }
