@@ -39,8 +39,8 @@ func GetEnclosure(cfg *m.Configuration) http.HandlerFunc {
 //	@Router			/{boxId}/fans/{fanId} [post]
 func UpdateFan(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		fan := *u.FindFanById(chi.URLParam(r, "fanId"), &box)
+		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+		fan := u.FindFanById(chi.URLParam(r, "fanId"), box)
 		if len(fan.ID) <= 0 {
 			BadRequestError(w, r)
 			return
@@ -70,8 +70,8 @@ func UpdateFan(cfg *m.Configuration) http.HandlerFunc {
 //	@Router			/{boxId}/lights/{lightId} [post]
 func UpdateLight(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		light := *u.FindLightById(chi.URLParam(r, "lightId"), &box)
+		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+		light := u.FindLightById(chi.URLParam(r, "lightId"), box)
 		if len(light.ID) <= 0 {
 			BadRequestError(w, r)
 			return
@@ -84,7 +84,7 @@ func UpdateLight(cfg *m.Configuration) http.HandlerFunc {
 			return
 		}
 
-		light.State = body.State
+		light.Level = body.Level
 		json.NewEncoder(w).Encode(light)
 	}
 }
@@ -104,8 +104,8 @@ func GetFan(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		fan := *u.FindFanById(chi.URLParam(r, "fanId"), &box)
+		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+		fan := u.FindFanById(chi.URLParam(r, "fanId"), box)
 		if len(fan.ID) <= 0 {
 			BadRequestError(w, r)
 			return
@@ -129,8 +129,8 @@ func GetLight(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		light := *u.FindLightById(chi.URLParam(r, "lightId"), &box)
+		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+		light := u.FindLightById(chi.URLParam(r, "lightId"), box)
 		if len(light.ID) <= 0 {
 			BadRequestError(w, r)
 			return
@@ -154,8 +154,8 @@ func GetSensor(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		sensor := *u.FindSensorById(chi.URLParam(r, "sensorId"), &box)
+		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+		sensor := u.FindSensorById(chi.URLParam(r, "sensorId"), box)
 		if len(sensor.ID) <= 0 {
 			BadRequestError(w, r)
 			return
@@ -179,8 +179,8 @@ func GetSensorData(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		box := *u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		sensor := *u.FindSensorById(chi.URLParam(r, "sensorId"), &box)
+		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
+		sensor := u.FindSensorById(chi.URLParam(r, "sensorId"), box)
 		if len(sensor.ID) <= 0 {
 			BadRequestError(w, r)
 			return
