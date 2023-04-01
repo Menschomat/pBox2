@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -41,15 +42,15 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 		case "sensors":
 			sensor := utils.FindSensorById(itemId, box)
 			log.Println("HANDLING - SENSOR-EVENT:", sensor.ID)
-			if f64, err := strconv.ParseFloat(string(msg.Payload()), 32); err == nil {
-				go storeValueInTimeSeries(float32(f64), &sensor.TimeSeries)
+			if f32, err := strconv.ParseFloat(string(msg.Payload()), 32); err == nil {
+				go storeValueInTimeSeries(float32(f32), &sensor.TimeSeries)
 				sensorEvent, err := json.Marshal(
 					model.NewSensorEvent(
 						cfg.Enclosure.ID+"/"+box.ID,
 						model.SensorEventBody{
 							ID:   sensor.ID,
 							Unit: sensor.Unit, Type: sensor.Type,
-							Value: f64,
+							Value: math.Round(f32*100) / 100,
 							Time:  time.Now().Format(time.RFC3339),
 						},
 					),
@@ -96,9 +97,9 @@ func sub(client mqtt.Client) {
 	}
 }
 
-//	@title		pBox2 API-Docs
-//	@version	1.0
-//	@BasePath	/api/v1
+// @title		pBox2 API-Docs
+// @version	1.0
+// @BasePath	/api/v1
 func main() {
 	log.Println("*_-_-_-pBox2-_-_-_*")
 	rand.Seed(time.Now().UnixNano())
