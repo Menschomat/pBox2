@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	m "github.com/Menschomat/pBox2/model"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -25,7 +26,7 @@ func NewBasicRouter() *chi.Mux {
 }
 
 // NewRouter returns a router handle loaded with all the supported routes
-func NewApiRouter(cfg *m.Configuration) *chi.Mux {
+func NewApiRouter(cfg *m.Configuration, mqttClient mqtt.Client) *chi.Mux {
 	r := NewBasicRouter()
 	var routes = []Route{
 		{
@@ -41,7 +42,7 @@ func NewApiRouter(cfg *m.Configuration) *chi.Mux {
 		{
 			Method:      "POST",
 			Path:        "/{boxId}/lights/{lightId}",
-			HandlerFunc: UpdateLight(cfg),
+			HandlerFunc: UpdateLight(cfg, mqttClient),
 		},
 		{
 			Method:      "GET",
@@ -51,7 +52,7 @@ func NewApiRouter(cfg *m.Configuration) *chi.Mux {
 		{
 			Method:      "POST",
 			Path:        "/{boxId}/fans/{fanId}",
-			HandlerFunc: UpdateFan(cfg),
+			HandlerFunc: UpdateFan(cfg, mqttClient),
 		},
 		{
 			Method:      "GET",

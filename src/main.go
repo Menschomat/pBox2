@@ -108,7 +108,7 @@ func main() {
 	}
 	log.Println("Spawning API")
 	appRouter := api.NewBasicRouter()
-	apiV1Router := api.NewApiRouter(&cfg)
+	apiV1Router := api.NewApiRouter(&cfg, client)
 	appRouter.Mount("/api/v1", apiV1Router)
 	appRouter.Mount("/swagger", httpSwagger.WrapHandler)
 	appRouter.Mount("/", websocket)

@@ -3,10 +3,12 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	_ "github.com/Menschomat/pBox2/docs"
 	m "github.com/Menschomat/pBox2/model"
 	u "github.com/Menschomat/pBox2/utils"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -49,7 +51,7 @@ func GetLight(cfg *m.Configuration) http.HandlerFunc {
 //	@Success		200		{object}	m.Light
 //	@Failure		400		{string}	string	"Bad Request"
 //	@Router			/{boxId}/lights/{lightId} [post]
-func UpdateLight(cfg *m.Configuration) http.HandlerFunc {
+func UpdateLight(cfg *m.Configuration, mqttClient mqtt.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
 		light := u.FindLightById(chi.URLParam(r, "lightId"), box)
@@ -66,6 +68,7 @@ func UpdateLight(cfg *m.Configuration) http.HandlerFunc {
 		}
 
 		light.Level = body.Level
+		mqttClient.Publish("test/"+box.ID+"/lights/"+light.ID, 0, false, strconv.Itoa(light.Level))
 		json.NewEncoder(w).Encode(light)
 	}
 }

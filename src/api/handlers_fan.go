@@ -3,10 +3,12 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	_ "github.com/Menschomat/pBox2/docs"
 	m "github.com/Menschomat/pBox2/model"
 	u "github.com/Menschomat/pBox2/utils"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -49,7 +51,7 @@ func GetFan(cfg *m.Configuration) http.HandlerFunc {
 //	@Success		200		{object}	m.Fan
 //	@Failure		400		{string}	string	"Bad Request"
 //	@Router			/{boxId}/fans/{fanId} [post]
-func UpdateFan(cfg *m.Configuration) http.HandlerFunc {
+func UpdateFan(cfg *m.Configuration, mqttClient mqtt.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
 		fan := u.FindFanById(chi.URLParam(r, "fanId"), box)
@@ -66,6 +68,7 @@ func UpdateFan(cfg *m.Configuration) http.HandlerFunc {
 		}
 
 		fan.Level = body.Level
+		mqttClient.Publish("test/"+box.ID+"/fans/"+fan.ID, 0, false, strconv.Itoa(fan.Level))
 		json.NewEncoder(w).Encode(fan)
 	}
 }
