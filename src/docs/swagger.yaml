@@ -42,19 +42,15 @@ definitions:
         type: integer
       name:
         type: string
-      pin:
-        type: integer
     type: object
   model.Light:
     properties:
       id:
         type: string
+      level:
+        type: integer
       name:
         type: string
-      pins:
-        items:
-          type: integer
-        type: array
       state:
         type: boolean
       type:

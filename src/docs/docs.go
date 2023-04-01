@@ -324,9 +324,6 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
-                },
-                "pin": {
-                    "type": "integer"
                 }
             }
         },
@@ -336,14 +333,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "level": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
-                },
-                "pins": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 },
                 "state": {
                     "type": "boolean"
