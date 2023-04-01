@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/enclosure": {
             "get": {
-                "description": "get string by ID",
+                "description": "Returns the whole enclosure",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "enclosure"
                 ],
-                "summary": "returns whole enclosure",
+                "summary": "Get enclosure",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -41,7 +41,7 @@ const docTemplate = `{
         },
         "/{boxId}/fans/{fanId}": {
             "get": {
-                "description": "get fan by box- and fan-id",
+                "description": "Retrieve a fan object by its ID and the ID of the box it belongs to",
                 "consumes": [
                     "application/json"
                 ],
@@ -51,17 +51,17 @@ const docTemplate = `{
                 "tags": [
                     "fan"
                 ],
-                "summary": "returns fan",
+                "summary": "Get fan",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Box ID",
                         "name": "boxId",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Fan ID",
                         "name": "fanId",
                         "in": "path",
@@ -74,11 +74,17 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Fan"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
             "post": {
-                "description": "get fan by box- and fan-id",
+                "description": "Update a fan object by its ID and the ID of the box it belongs to",
                 "consumes": [
                     "application/json"
                 ],
@@ -88,11 +94,25 @@ const docTemplate = `{
                 "tags": [
                     "fan"
                 ],
-                "summary": "updates fan",
+                "summary": "Update fan",
                 "parameters": [
                     {
-                        "description": "body",
-                        "name": "request",
+                        "type": "integer",
+                        "description": "Box ID",
+                        "name": "boxId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Fan ID",
+                        "name": "fanId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fan object",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -106,13 +126,19 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Fan"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
         "/{boxId}/lights/{lightId}": {
             "get": {
-                "description": "get light by box- and light-id",
+                "description": "Get information about a specific light in a specific box",
                 "consumes": [
                     "application/json"
                 ],
@@ -122,7 +148,7 @@ const docTemplate = `{
                 "tags": [
                     "light"
                 ],
-                "summary": "returns light",
+                "summary": "Get light",
                 "parameters": [
                     {
                         "type": "string",
@@ -145,11 +171,17 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Light"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
             "post": {
-                "description": "get light by box- and light-id",
+                "description": "Update the level of a specific light in a specific box",
                 "consumes": [
                     "application/json"
                 ],
@@ -159,10 +191,24 @@ const docTemplate = `{
                 "tags": [
                     "light"
                 ],
-                "summary": "updates light",
+                "summary": "Update light",
                 "parameters": [
                     {
-                        "description": "body",
+                        "type": "string",
+                        "description": "Box ID",
+                        "name": "boxId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Light ID",
+                        "name": "lightId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Light object",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -177,13 +223,19 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Light"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
         "/{boxId}/sensors/{sensorId}": {
             "get": {
-                "description": "get sensor by box- and sensor-id",
+                "description": "Get a sensor by its box and sensor ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -193,7 +245,7 @@ const docTemplate = `{
                 "tags": [
                     "sensor"
                 ],
-                "summary": "returns sensor",
+                "summary": "Get Sensor",
                 "parameters": [
                     {
                         "type": "string",
@@ -216,13 +268,19 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Sensor"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
         "/{boxId}/sensors/{sensorId}/data": {
             "get": {
-                "description": "get sensor-data as time-series by box- and sensor-id",
+                "description": "Get time-series data for a sensor by its box and sensor ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -232,7 +290,7 @@ const docTemplate = `{
                 "tags": [
                     "sensor"
                 ],
-                "summary": "returns sensor-data as time-series",
+                "summary": "Get Sensor Data",
                 "parameters": [
                     {
                         "type": "string",
@@ -254,6 +312,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.TimeSeries"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }

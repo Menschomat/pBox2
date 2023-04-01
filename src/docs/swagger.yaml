@@ -103,18 +103,19 @@ paths:
     get:
       consumes:
       - application/json
-      description: get fan by box- and fan-id
+      description: Retrieve a fan object by its ID and the ID of the box it belongs
+        to
       parameters:
       - description: Box ID
         in: path
         name: boxId
         required: true
-        type: string
+        type: integer
       - description: Fan ID
         in: path
         name: fanId
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -122,17 +123,32 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Fan'
-      summary: returns fan
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Get fan
       tags:
       - fan
     post:
       consumes:
       - application/json
-      description: get fan by box- and fan-id
+      description: Update a fan object by its ID and the ID of the box it belongs
+        to
       parameters:
-      - description: body
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: integer
+      - description: Fan ID
+        in: path
+        name: fanId
+        required: true
+        type: integer
+      - description: Fan object
         in: body
-        name: request
+        name: body
         required: true
         schema:
           $ref: '#/definitions/model.Fan'
@@ -143,14 +159,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Fan'
-      summary: updates fan
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Update fan
       tags:
       - fan
   /{boxId}/lights/{lightId}:
     get:
       consumes:
       - application/json
-      description: get light by box- and light-id
+      description: Get information about a specific light in a specific box
       parameters:
       - description: Box ID
         in: path
@@ -169,15 +189,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Light'
-      summary: returns light
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Get light
       tags:
       - light
     post:
       consumes:
       - application/json
-      description: get light by box- and light-id
+      description: Update the level of a specific light in a specific box
       parameters:
-      - description: body
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Light ID
+        in: path
+        name: lightId
+        required: true
+        type: string
+      - description: Light object
         in: body
         name: request
         required: true
@@ -190,14 +224,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Light'
-      summary: updates light
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Update light
       tags:
       - light
   /{boxId}/sensors/{sensorId}:
     get:
       consumes:
       - application/json
-      description: get sensor by box- and sensor-id
+      description: Get a sensor by its box and sensor ID.
       parameters:
       - description: Box ID
         in: path
@@ -216,14 +254,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Sensor'
-      summary: returns sensor
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Get Sensor
       tags:
       - sensor
   /{boxId}/sensors/{sensorId}/data:
     get:
       consumes:
       - application/json
-      description: get sensor-data as time-series by box- and sensor-id
+      description: Get time-series data for a sensor by its box and sensor ID.
       parameters:
       - description: Box ID
         in: path
@@ -242,14 +284,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.TimeSeries'
-      summary: returns sensor-data as time-series
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Get Sensor Data
       tags:
       - sensor
   /enclosure:
     get:
       consumes:
       - application/json
-      description: get string by ID
+      description: Returns the whole enclosure
       produces:
       - application/json
       responses:
@@ -257,7 +303,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Enclosure'
-      summary: returns whole enclosure
+      summary: Get enclosure
       tags:
       - enclosure
 swagger: "2.0"
