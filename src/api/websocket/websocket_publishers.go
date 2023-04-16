@@ -10,6 +10,8 @@ import (
 	"github.com/Menschomat/pBox2/model"
 )
 
+// PublishLightEvent publishes a WebSocket event containing the current level
+// of the given light to all connected clients.
 func PublishLightEvent(cfg *model.Configuration, box *model.Box, light *model.Light, level int) {
 	event, err := json.Marshal(
 		model.NewLightEvent(
@@ -27,6 +29,8 @@ func PublishLightEvent(cfg *model.Configuration, box *model.Box, light *model.Li
 	wsServer.Publish(event)
 }
 
+// PublishFanEvent publishes a WebSocket event containing the current level
+// of the given fan to all connected clients.
 func PublishFanEvent(cfg *model.Configuration, box *model.Box, fan *model.Fan, level int) {
 	event, err := json.Marshal(
 		model.NewFanEvent(
@@ -43,6 +47,9 @@ func PublishFanEvent(cfg *model.Configuration, box *model.Box, fan *model.Fan, l
 	}
 	wsServer.Publish(event)
 }
+
+// PublishSensorEvent publishes a WebSocket event containing the current value
+// of the given sensor to all connected clients.
 func PublishSensorEvent(cfg *model.Configuration, box *model.Box, sensor *model.Sensor, value float64) {
 	event, err := json.Marshal(
 		model.NewSensorEvent(
