@@ -56,46 +56,32 @@ pBox2 is a software application written in Golang for controlling 3D printer enc
 - `unit` (string): The unit of measurement for the sensor data.
 
 ```
-+----------------------------------------+
-|              Configuration              |
-+----------------------------------------+
-| mqtt                                   |
-| +--------------------------------------+ 
-| | broker                               |
-| | port                                 |
-| | client_id                            |
-| | username                             |
-| | password                             |
-| | topic                                |
-| +--------------------------------------+ 
-| enclosure                              |
-| +--------------------------------------+ 
-| | id                                   |
-| | name                                 |
-| | location                             |
-| | boxes                                |
-| | +------------------------------------+
-| | | id                                 |
-| | | name                               |
-| | | location                           |
-| | | lights                             |
-| | | +----------------------------------+
-| | | | id                               |
-| | | | name                             |
-| | | | type                             |
-| | | +----------------------------------+
-| | | fans                               |
-| | | +----------------------------------+
-| | | | id                               |
-| | | | name                             |
-| | | +----------------------------------+
-| | | sensors                            |
-| | | +----------------------------------+
-| | | | id                               |
-| | | | name                             |
-| | | | type                             |
-| | | | unit                             |
-| | | +----------------------------------+
-| | +------------------------------------+
-| +--------------------------------------+
+Config-Structure
+├── mqtt
+│   ├── broker
+│   ├── port
+│   ├── client_id
+│   ├── username
+│   ├── password
+│   └── topic
+└── enclosure
+    ├── id
+    ├── name
+    ├── location
+    └── boxes
+        ├── id
+        ├── name
+        ├── location
+        ├── lights
+        │   ├── id
+        │   ├── name
+        │   └── type
+        ├── fans
+        │   ├── id
+        │   └── name
+        └── sensors
+            ├── id
+            ├── name
+            ├── type
+            └── unit
 ```
