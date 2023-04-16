@@ -10,7 +10,7 @@ pBox2 is a software application written in Golang for controlling 3D printer enc
 2. Navigate to the project directory: `cd pBox2`
 3. Install dependencies: `go mod download`
 ## Usage
-1. Start the application: go run main.go
+1. Start the application: `go run .`
 2. Open your browser and navigate to http://localhost:8080 to access the dashboard
 ## Configuration
 
