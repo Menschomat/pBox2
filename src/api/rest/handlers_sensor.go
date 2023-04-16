@@ -1,4 +1,4 @@
-package api
+package rest
 
 import (
 	"encoding/json"
@@ -62,10 +62,10 @@ func GetSensorData(cfg *m.Configuration) http.HandlerFunc {
 	}
 }
 
-//	@Summary		Bad Request Error
-//	@Description	Returns a 400 Bad Request error response
-//	@Tags			error
-//	@Failure		400	{string}	string	"Bad Request"
+// @Summary		Bad Request Error
+// @Description	Returns a 400 Bad Request error response
+// @Tags			error
+// @Failure		400	{string}	string	"Bad Request"
 func BadRequestError(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write([]byte("bad request error"))

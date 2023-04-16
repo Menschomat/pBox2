@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 
 	m "github.com/Menschomat/pBox2/model"
@@ -42,4 +43,12 @@ func Float64frombytes(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
 	float := math.Float64frombits(bits)
 	return float
+}
+func GetFloatValueFromPayload(payload []byte) (float64, error) {
+	return strconv.ParseFloat(string(payload), 32)
+}
+
+func GetIntValueFromPayload(payload []byte) (int, error) {
+	value, err := strconv.ParseInt(string(payload), 0, 32)
+	return int(value), err
 }

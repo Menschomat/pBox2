@@ -1,4 +1,4 @@
-package api
+package websocket
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"golang.org/x/time/rate"
 	"nhooyr.io/websocket"
 )
+
+var wsServer *WebSocketServer
 
 // WebSocketServer enables broadcasting to a set of subscribers.
 type WebSocketServer struct {
@@ -46,6 +48,7 @@ func NewWebSocketServer() *WebSocketServer {
 		publishLimiter:          rate.NewLimiter(rate.Every(time.Millisecond*100), 8),
 	}
 	cs.serveMux.HandleFunc("/subscribe", cs.SubscribeHandler)
+	wsServer = cs
 	return cs
 }
 

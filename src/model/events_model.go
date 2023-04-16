@@ -45,16 +45,30 @@ type LightEvent struct {
 	Body LightEventBody `json:"body"`
 }
 type LightEventBody struct {
-	ID    string     `json:"id"`
-	Type  SensorType `json:"type"`
-	Unit  string     `json:"unit"`
-	Value float64    `json:"value"`
-	Time  string     `json:"time"`
+	ID    string `json:"id"`
+	Level int    `json:"value"`
 }
 
 func NewLightEvent(topic string, body LightEventBody) *LightEvent {
 	return &LightEvent{
 		SocketEvent{Topic: topic, Time: time.Now().Format(time.RFC3339), Type: LIGHT},
+		body,
+	}
+}
+
+// LightEvent-------------------------------------------------------------
+type FanEvent struct {
+	SocketEvent
+	Body FanEventBody `json:"body"`
+}
+type FanEventBody struct {
+	ID    string `json:"id"`
+	Level int    `json:"value"`
+}
+
+func NewFanEvent(topic string, body FanEventBody) *FanEvent {
+	return &FanEvent{
+		SocketEvent{Topic: topic, Time: time.Now().Format(time.RFC3339), Type: FAN},
 		body,
 	}
 }

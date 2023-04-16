@@ -8,3 +8,8 @@ type Mqtt struct {
 	Password string `json:"password"`
 	Topic    string `json:"topic"`
 }
+
+type MqttMessage struct {
+	Payload  interface{} `json:"payload"`
+	ClientId string      `json:"clientId"`
+}

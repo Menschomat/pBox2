@@ -1,17 +1,15 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
-	"math"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/Menschomat/pBox2/api"
+	api_mqtt "github.com/Menschomat/pBox2/api/mqtt"
+	api_rest "github.com/Menschomat/pBox2/api/rest"
+	api_websocket "github.com/Menschomat/pBox2/api/websocket"
 	_ "github.com/Menschomat/pBox2/docs"
 	"github.com/Menschomat/pBox2/model"
 	"github.com/Menschomat/pBox2/utils"
@@ -21,7 +19,7 @@ import (
 
 const CFG_PATH = "config.json"
 
-var websocket = api.NewWebSocketServer()
+var websocket = api_websocket.NewWebSocketServer()
 var cfg = utils.ParesConfig(CFG_PATH)
 var opts = utils.GetBrokerOpts(cfg, messagePubHandler, connectHandler, connectLostHandler)
 var client = mqtt.NewClient(opts)
@@ -29,57 +27,41 @@ var lightStates map[string]bool
 var fanStates map[string]int
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	if strings.HasPrefix(msg.Topic(), cfg.Mqtt.Topic) {
-		log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
-		boxId, msgType, itemId, err := utils.ParseTopic(msg.Topic())
-		if err != nil {
-			log.Println(err.Error())
-			return
-		}
-		log.Println("BOX_ID:", boxId, "ITEM_ID:", itemId, "MSG_TYPE", msgType, "PAYLOAD:", string(msg.Payload()))
-		box := utils.FindBoxById(boxId, &cfg.Enclosure)
-		switch msgType {
-		case "sensors":
-			sensor := utils.FindSensorById(itemId, box)
-			log.Println("HANDLING - SENSOR-EVENT:", sensor.ID)
-			if f32, err := strconv.ParseFloat(string(msg.Payload()), 32); err == nil {
-				go storeValueInTimeSeries(float32(f32), &sensor.TimeSeries)
-				sensorEvent, err := json.Marshal(
-					model.NewSensorEvent(
-						cfg.Enclosure.ID+"/"+box.ID,
-						model.SensorEventBody{
-							ID:   sensor.ID,
-							Unit: sensor.Unit, Type: sensor.Type,
-							Value: math.Round(f32*100) / 100,
-							Time:  time.Now().Format(time.RFC3339),
-						},
-					),
-				)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				go websocket.Publish(sensorEvent)
-			}
-		case "light":
-			log.Println("LIGHT")
-		case "fans":
-			log.Println("FANS")
-		default:
-			log.Println("UNKNOWN")
-			return
-		}
+	handleMessage(&cfg, msg)
+}
 
+func handleMessage(cfg *model.Configuration, msg mqtt.Message) {
+	if !isValidTopic(cfg, msg.Topic()) {
+		return
+	}
+
+	logMessageReceived(msg)
+
+	boxID, itemType, itemID, err := utils.ParseTopic(msg.Topic())
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	box := utils.FindBoxById(boxID, &cfg.Enclosure)
+	switch itemType {
+	case "sensors":
+		api_mqtt.HandleSensorEvent(cfg, box, itemID, msg.Payload())
+	case "lights":
+		api_mqtt.HandleLightEvent(cfg, box, itemID, msg.Payload())
+	case "fans":
+		api_mqtt.HandleFanEvent(cfg, box, itemID, msg.Payload())
+	default:
+		log.Println("UNKNOWN")
 	}
 }
 
-func storeValueInTimeSeries(value float32, timeSeries *model.TimeSeries) {
-	timeSeries.Times = append(timeSeries.Times, time.Now().Format(time.RFC3339))
-	timeSeries.Values = append(timeSeries.Values, value)
-	if len(timeSeries.Times) > 200 {
-		timeSeries.Times = timeSeries.Times[1:]
-		timeSeries.Values = timeSeries.Values[1:]
-	}
+func isValidTopic(cfg *model.Configuration, topic string) bool {
+	return strings.HasPrefix(topic, cfg.Mqtt.Topic)
+}
+
+func logMessageReceived(msg mqtt.Message) {
+	log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
@@ -107,8 +89,8 @@ func main() {
 		panic(token.Error())
 	}
 	log.Println("Spawning API")
-	appRouter := api.NewBasicRouter()
-	apiV1Router := api.NewApiRouter(&cfg, client)
+	appRouter := api_rest.NewBasicRouter()
+	apiV1Router := api_rest.NewApiRouter(&cfg, client)
 	appRouter.Mount("/api/v1", apiV1Router)
 	appRouter.Mount("/swagger", httpSwagger.WrapHandler)
 	appRouter.Mount("/", websocket)
