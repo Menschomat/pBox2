@@ -10,7 +10,7 @@ import (
 // HandleFanEvent handles MQTT messages related to fans.
 // It updates the fan's level if the new value is different from the current value,
 // and publishes a WebSocket event to notify clients of the change.
-func HandleFanEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
+func handleFanEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
 	fan := utils.FindFanById(itemID, box)
 	if value, err := utils.GetIntValueFromPayload(payload); err == nil {
 		if fan.Level != value {
@@ -23,7 +23,7 @@ func HandleFanEvent(cfg *model.Configuration, box *model.Box, itemID string, pay
 // HandleLightEvent handles MQTT messages related to lights.
 // It updates the light's level if the new value is different from the current value,
 // and publishes a WebSocket event to notify clients of the change.
-func HandleLightEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
+func handleLightEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
 	light := utils.FindLightById(itemID, box)
 	if value, err := utils.GetIntValueFromPayload(payload); err == nil {
 		if light.Level != value {
@@ -36,7 +36,7 @@ func HandleLightEvent(cfg *model.Configuration, box *model.Box, itemID string, p
 // HandleSensorEvent handles MQTT messages related to sensors.
 // It updates the sensor's time series with the new value, and publishes a WebSocket event
 // to notify clients of the change.
-func HandleSensorEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
+func handleSensorEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
 	sensor := utils.FindSensorById(itemID, box)
 	if value, err := utils.GetFloatValueFromPayload(payload); err == nil {
 		utils.StoreValueInTimeSeries(float32(value), &sensor.TimeSeries)

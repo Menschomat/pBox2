@@ -21,3 +21,9 @@ type LightType string
 const (
 	MONO LightType = "MONO"
 )
+
+type SwitchType string
+
+const (
+	TASMOTA_MQTT SwitchType = "TASMOTA_MQTT"
+)

@@ -18,6 +18,12 @@ type Light struct {
 	Level int       `json:"level"`
 	State bool      `json:"state"`
 }
+type Switch struct {
+	ID    string     `json:"id"`
+	Name  string     `json:"name"`
+	Type  SwitchType `json:"type"`
+	State bool       `json:"state"`
+}
 type Fan struct {
 	ID         string     `json:"id"`
 	Name       string     `json:"name"`
@@ -30,6 +36,7 @@ type Box struct {
 	Name     string   `json:"name"`
 	Location string   `json:"location"`
 	Lights   []Light  `json:"lights"`
+	Switches []Switch `json:"switches"`
 	Fans     []Fan    `json:"fans"`
 	Sensors  []Sensor `json:"sensors"`
 }

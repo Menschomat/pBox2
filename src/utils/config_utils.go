@@ -7,11 +7,19 @@ import (
 	m "github.com/Menschomat/pBox2/model"
 )
 
-func ParesConfig(path string) m.Configuration {
+const CFG_PATH = "config.json"
+
+var cfg = paresConfig(CFG_PATH)
+
+func paresConfig(path string) m.Configuration {
 	file, _ := ioutil.ReadFile(path)
 	data := m.Configuration{}
 	_ = json.Unmarshal([]byte(file), &data)
 	return data
+}
+
+func GetConfig() m.Configuration {
+	return cfg
 }
 
 func FindBoxById(id string, enclosure *m.Enclosure) *m.Box {
