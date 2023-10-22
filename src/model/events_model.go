@@ -16,6 +16,7 @@ type EventType string
 const (
 	SENSOR EventType = "SENSOR"
 	LIGHT  EventType = "LIGHT"
+	SWITCH EventType = "SWITCH"
 	FAN    EventType = "FAN"
 )
 
@@ -35,6 +36,23 @@ type SensorEventBody struct {
 func NewSensorEvent(topic string, body SensorEventBody) *SensorEvent {
 	return &SensorEvent{
 		SocketEvent{Topic: topic, Time: time.Now().Format(time.RFC3339), Type: SENSOR},
+		body,
+	}
+}
+
+// SwitchEvent-------------------------------------------------------------
+type SwitchEvent struct {
+	SocketEvent
+	Body SwitchEventBody `json:"body"`
+}
+type SwitchEventBody struct {
+	ID    string `json:"id"`
+	State bool   `json:"state"`
+}
+
+func NewSwitchEvent(topic string, body SwitchEventBody) *SwitchEvent {
+	return &SwitchEvent{
+		SocketEvent{Topic: topic, Time: time.Now().Format(time.RFC3339), Type: SWITCH},
 		body,
 	}
 }

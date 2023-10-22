@@ -12,13 +12,32 @@ import (
 
 // PublishLightEvent publishes a WebSocket event containing the current level
 // of the given light to all connected clients.
-func PublishLightEvent(cfg *model.Configuration, box *model.Box, light *model.Light, level int) {
+func PublishSwitchEvent(cfg *model.Configuration, box *model.Box, switc *model.Switch) {
+	event, err := json.Marshal(
+		model.NewSwitchEvent(
+			cfg.Enclosure.ID+"/"+box.ID,
+			model.SwitchEventBody{
+				ID:    switc.ID,
+				State: switc.State,
+			},
+		),
+	)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	wsServer.Publish(event)
+}
+
+// PublishLightEvent publishes a WebSocket event containing the current level
+// of the given light to all connected clients.
+func PublishLightEvent(cfg *model.Configuration, box *model.Box, light *model.Light) {
 	event, err := json.Marshal(
 		model.NewLightEvent(
 			cfg.Enclosure.ID+"/"+box.ID,
 			model.LightEventBody{
 				ID:    light.ID,
-				Level: level,
+				Level: light.Level,
 			},
 		),
 	)
@@ -31,13 +50,13 @@ func PublishLightEvent(cfg *model.Configuration, box *model.Box, light *model.Li
 
 // PublishFanEvent publishes a WebSocket event containing the current level
 // of the given fan to all connected clients.
-func PublishFanEvent(cfg *model.Configuration, box *model.Box, fan *model.Fan, level int) {
+func PublishFanEvent(cfg *model.Configuration, box *model.Box, fan *model.Fan) {
 	event, err := json.Marshal(
 		model.NewFanEvent(
 			cfg.Enclosure.ID+"/"+box.ID,
 			model.FanEventBody{
 				ID:    fan.ID,
-				Level: level,
+				Level: fan.Level,
 			},
 		),
 	)

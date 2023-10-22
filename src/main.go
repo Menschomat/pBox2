@@ -16,7 +16,7 @@ import (
 
 var websocket = api_websocket.NewWebSocketServer()
 var cfg = utils.GetConfig()
-var client = api_mqtt.GetClient()
+var client = api_mqtt.NewMQTTClient()
 
 // @title		pBox2 API-Docs
 // @version	1.0
@@ -24,12 +24,12 @@ var client = api_mqtt.GetClient()
 func main() {
 	log.Println("*_-_-_-pBox2-_-_-_*")
 	rand.Seed(time.Now().UnixNano())
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
+	if token := client.GetClient().Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
 	log.Println("Spawning API")
 	appRouter := api_rest.NewBasicRouter()
-	apiV1Router := api_rest.NewApiRouter(&cfg, client)
+	apiV1Router := api_rest.NewApiRouter(&cfg, client.GetClient())
 	appRouter.Mount("/api/v1", apiV1Router)
 	appRouter.Mount("/swagger", httpSwagger.WrapHandler)
 	appRouter.Mount("/", websocket)

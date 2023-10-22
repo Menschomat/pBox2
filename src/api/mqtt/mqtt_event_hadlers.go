@@ -1,45 +1,52 @@
 package mqtt
 
 import (
+	"log"
+
 	"github.com/Menschomat/pBox2/api/websocket"
-	_ "github.com/Menschomat/pBox2/docs"
 	"github.com/Menschomat/pBox2/model"
 	"github.com/Menschomat/pBox2/utils"
 )
 
-// HandleFanEvent handles MQTT messages related to fans.
-// It updates the fan's level if the new value is different from the current value,
-// and publishes a WebSocket event to notify clients of the change.
-func handleFanEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
+// handleFanEvent updates the fan's level and notifies clients if there's a change.
+func (c *MQTTClient) handleFanEvent(box *model.Box, itemID string, payload []byte) {
 	fan := utils.FindFanById(itemID, box)
-	if value, err := utils.GetIntValueFromPayload(payload); err == nil {
-		if fan.Level != value {
-			fan.Level = value
-			websocket.PublishFanEvent(cfg, box, fan, value)
-		}
+	value, err := utils.GetIntValueFromPayload(payload)
+	if err != nil {
+		log.Printf("Error parsing payload: %v", err)
+		return
+	}
+
+	if fan.Level != value {
+		fan.Level = value
+		websocket.PublishFanEvent(c.cfg, box, fan)
 	}
 }
 
-// HandleLightEvent handles MQTT messages related to lights.
-// It updates the light's level if the new value is different from the current value,
-// and publishes a WebSocket event to notify clients of the change.
-func handleLightEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
+// handleLightEvent updates the light's level and notifies clients if there's a change.
+func (c *MQTTClient) handleLightEvent(box *model.Box, itemID string, payload []byte) {
 	light := utils.FindLightById(itemID, box)
-	if value, err := utils.GetIntValueFromPayload(payload); err == nil {
-		if light.Level != value {
-			light.Level = value
-			websocket.PublishLightEvent(cfg, box, light, value)
-		}
+	value, err := utils.GetIntValueFromPayload(payload)
+	if err != nil {
+		log.Printf("Error parsing payload: %v", err)
+		return
+	}
+
+	if light.Level != value {
+		light.Level = value
+		websocket.PublishLightEvent(c.cfg, box, light)
 	}
 }
 
-// HandleSensorEvent handles MQTT messages related to sensors.
-// It updates the sensor's time series with the new value, and publishes a WebSocket event
-// to notify clients of the change.
-func handleSensorEvent(cfg *model.Configuration, box *model.Box, itemID string, payload []byte) {
+// handleSensorEvent updates the sensor's data and notifies clients.
+func (c *MQTTClient) handleSensorEvent(box *model.Box, itemID string, payload []byte) {
 	sensor := utils.FindSensorById(itemID, box)
-	if value, err := utils.GetFloatValueFromPayload(payload); err == nil {
-		utils.StoreValueInTimeSeries(float32(value), &sensor.TimeSeries)
-		websocket.PublishSensorEvent(cfg, box, sensor, value)
+	value, err := utils.GetFloatValueFromPayload(payload)
+	if err != nil {
+		log.Printf("Error parsing payload: %v", err)
+		return
 	}
+
+	utils.StoreValueInTimeSeries(float32(value), &sensor.TimeSeries)
+	websocket.PublishSensorEvent(c.cfg, box, sensor, value)
 }

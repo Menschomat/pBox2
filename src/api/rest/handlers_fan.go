@@ -12,63 +12,84 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// GetFan godoc
-//
-//	@Summary		Get fan
-//	@Description	Retrieve a fan object by its ID and the ID of the box it belongs to
-//	@Tags			fan
-//	@Accept			json
-//	@Produce		json
-//	@Param			boxId	path		int	true	"Box ID"
-//	@Param			fanId	path		int	true	"Fan ID"
-//	@Success		200		{object}	m.Fan
-//	@Failure		400		{string}	string	"Bad Request"
-//	@Router			/{boxId}/fans/{fanId} [get]
+// respondWithError writes a json response with an error message and a status code.
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+// respondWithJSON writes a json response with a payload and a status code.
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(payload)
+}
+
+// GetFan handles the retrieval of a fan by its ID and the ID of its parent box.
+// @Summary Retrieve a fan by its ID.
+// @Description Get the details of a specific fan by its unique ID and the ID of the box it belongs to.
+// @Tags fan
+// @Accept json
+// @Produce json
+// @Param boxId path int true "Box ID"
+// @Param fanId path int true "Fan ID"
+// @Success 200 {object} m.Fan "Successfully retrieved fan"
+// @Failure 400 {object} string "Invalid ID format or fan not found"
+// @Router /{boxId}/fans/{fanId} [get]
 func GetFan(cfg *m.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		fan := u.FindFanById(chi.URLParam(r, "fanId"), box)
-		if len(fan.ID) <= 0 {
-			BadRequestError(w, r)
+		boxID := chi.URLParam(r, "boxId")
+		fanID := chi.URLParam(r, "fanId")
+
+		box := u.FindBoxById(boxID, &cfg.Enclosure)
+		fan := u.FindFanById(fanID, box)
+		if fan == nil || len(fan.ID) == 0 {
+			respondWithError(w, http.StatusBadRequest, "Invalid box ID or fan ID")
 			return
 		}
-		json.NewEncoder(w).Encode(fan)
+
+		respondWithJSON(w, http.StatusOK, fan)
 	}
 }
 
-// UpdateFan godoc
-//
-//	@Summary		Update fan
-//	@Description	Update a fan object by its ID and the ID of the box it belongs to
-//	@Tags			fan
-//	@Accept			json
-//	@Produce		json
-//	@Param			boxId	path		int		true	"Box ID"
-//	@Param			fanId	path		int		true	"Fan ID"
-//	@Param			body	body		m.Fan	true	"Fan object"
-//	@Success		200		{object}	m.Fan
-//	@Failure		400		{string}	string	"Bad Request"
-//	@Router			/{boxId}/fans/{fanId} [post]
+// UpdateFan handles the update of a fan's information.
+// @Summary Update a fan's information.
+// @Description Update the information of a specific fan by its unique ID and the ID of the box it belongs to.
+// @Tags fan
+// @Accept json
+// @Produce json
+// @Param boxId path int true "Box ID"
+// @Param fanId path int true "Fan ID"
+// @Param body body m.Fan true "Fan object to update"
+// @Success 200 {object} m.Fan "Successfully updated fan"
+// @Failure 400 {object} string "Invalid payload format or fan not found"
+// @Router /{boxId}/fans/{fanId} [post]
 func UpdateFan(cfg *m.Configuration, mqttClient mqtt.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		box := u.FindBoxById(chi.URLParam(r, "boxId"), &cfg.Enclosure)
-		fan := u.FindFanById(chi.URLParam(r, "fanId"), box)
-		if len(fan.ID) <= 0 {
-			BadRequestError(w, r)
+		boxID := chi.URLParam(r, "boxId")
+		fanID := chi.URLParam(r, "fanId")
+
+		box := u.FindBoxById(boxID, &cfg.Enclosure)
+		fan := u.FindFanById(fanID, box)
+		if fan == nil || len(fan.ID) == 0 {
+			respondWithError(w, http.StatusBadRequest, "Invalid box ID or fan ID")
 			return
 		}
 
-		var body m.Fan
-		err := json.NewDecoder(r.Body).Decode(&body)
-		if err != nil {
-			BadRequestError(w, r)
+		var updatedFan m.Fan
+		if err := json.NewDecoder(r.Body).Decode(&updatedFan); err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 			return
 		}
+		defer r.Body.Close()
 
-		fan.Level = body.Level
-		mqttClient.Publish("test/"+box.ID+"/fans/"+fan.ID, 0, false, strconv.Itoa(fan.Level))
-		json.NewEncoder(w).Encode(fan)
+		fan.Level = updatedFan.Level
+
+		// Validate or process the new fan level before publishing it.
+		topic := "test/" + box.ID + "/fans/" + fan.ID
+		mqttClient.Publish(topic, 0, false, strconv.Itoa(fan.Level))
+
+		respondWithJSON(w, http.StatusOK, fan)
 	}
 }

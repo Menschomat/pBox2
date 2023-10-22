@@ -31,18 +31,21 @@ func GetBrokerOpts(
 	return opts
 }
 
-func ParseTopic(topic string) (string, string, string, error) {
+func ParseTopic(topic string) ([]string, error) {
 	s := strings.Split(topic, "/")
-	if len(s) != 4 {
-		return "", "", "", errors.New("Unable to parse topic!")
+	if len(s) < 4 {
+		return []string{}, errors.New("Unable to parse topic!")
 	}
-	return s[1], s[2], s[3], nil
+	return s[1:], nil
 }
 
 func Float64frombytes(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
 	float := math.Float64frombits(bits)
 	return float
+}
+func GetStringFromPayload(payload []byte) string {
+	return string(payload)
 }
 func GetFloatValueFromPayload(payload []byte) (float64, error) {
 	return strconv.ParseFloat(string(payload), 32)
