@@ -33,7 +33,7 @@ func main() {
 	appRouter.Mount("/api/v1", apiV1Router)
 	appRouter.Mount("/swagger", httpSwagger.WrapHandler)
 	appRouter.Mount("/ws", websocket)
-	fs := http.FileServer(http.Dir("./static"))
+	fs := http.FileServer(http.Dir("./static/dashboard"))
 	appRouter.Handle("/*", http.StripPrefix("", fs))
 	err := http.ListenAndServe(":8080", appRouter)
 	if err != nil {
