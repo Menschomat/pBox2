@@ -32,7 +32,9 @@ func main() {
 	apiV1Router := api_rest.NewApiRouter(&cfg, client.GetClient())
 	appRouter.Mount("/api/v1", apiV1Router)
 	appRouter.Mount("/swagger", httpSwagger.WrapHandler)
-	appRouter.Mount("/", websocket)
+	appRouter.Mount("/ws", websocket)
+	fs := http.FileServer(http.Dir("./static"))
+	appRouter.Handle("/*", http.StripPrefix("", fs))
 	err := http.ListenAndServe(":8080", appRouter)
 	if err != nil {
 		log.Fatalln("There's an error with the server", err)

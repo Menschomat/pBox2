@@ -47,7 +47,7 @@ func NewWebSocketServer() *WebSocketServer {
 		subscribers:             make(map[*subscriber]struct{}),
 		publishLimiter:          rate.NewLimiter(rate.Every(time.Millisecond*100), 8),
 	}
-	cs.serveMux.HandleFunc("/subscribe", cs.SubscribeHandler)
+	cs.serveMux.HandleFunc("/ws/subscribe", cs.SubscribeHandler)
 	wsServer = cs
 	return cs
 }
