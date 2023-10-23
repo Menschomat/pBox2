@@ -35,7 +35,7 @@ func (c *MQTTClient) processTasmotaMessage(msg mqtt.Message) {
 	}
 
 	deviceId, method := topicParts[1], topicParts[2]
-	switc, box := utils.FindByTasmotaId(deviceId, &c.cfg.Enclosure)
+	switc, box := utils.FindSwitchByIdInEnc(deviceId, &c.cfg.Enclosure)
 	if switc == nil || box == nil {
 		log.Printf("Device or box not found for ID: %s", deviceId)
 		return
@@ -57,12 +57,18 @@ func (c *MQTTClient) handleSwitchEvent(sw *model.Switch, box *model.Box, payload
 		return
 	}
 
-	sw.State = strToBool(stateStr)
+	sw.State = StrToBool(stateStr)
 	websocket.PublishSwitchEvent(c.cfg, box, sw)
 }
 
 // strToBool converts "on" and "off" strings to their boolean equivalents.
-func strToBool(s string) bool {
+func StrToBool(s string) bool {
 	stateMap := map[string]bool{"on": true, "off": false}
 	return stateMap[strings.ToLower(s)]
+}
+
+// strToBool converts "on" and "off" strings to their boolean equivalents.
+func BoolToStr(s bool) string {
+	stateMap := map[bool]string{true: "on", false: "off"}
+	return stateMap[s]
 }

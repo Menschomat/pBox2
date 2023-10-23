@@ -56,6 +56,16 @@ func NewApiRouter(cfg *m.Configuration, mqttClient mqtt.Client) *chi.Mux {
 		},
 		{
 			Method:      "GET",
+			Path:        "/{boxId}/switches/{switchId}",
+			HandlerFunc: GetSwitch(cfg),
+		},
+		{
+			Method:      "POST",
+			Path:        "/{boxId}/switches/{switchId}",
+			HandlerFunc: UpdateSwitch(cfg, mqttClient),
+		},
+		{
+			Method:      "GET",
 			Path:        "/{boxId}/sensors/{sensorId}",
 			HandlerFunc: GetSensor(cfg),
 		},

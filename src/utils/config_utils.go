@@ -30,15 +30,27 @@ func FindBoxById(id string, enclosure *m.Enclosure) *m.Box {
 	}
 	return &m.Box{}
 }
-func FindByTasmotaId(id string, enclosure *m.Enclosure) (*m.Switch, *m.Box) {
+func FindSwitchByIdInEnc(id string, enclosure *m.Enclosure) (*m.Switch, *m.Box) {
 	for idx := range enclosure.Boxes {
-		for s_idx := range enclosure.Boxes[idx].Sensors {
-			if enclosure.Boxes[idx].ID == id {
+		for s_idx := range enclosure.Boxes[idx].Switches {
+			if enclosure.Boxes[idx].Switches[s_idx].ID == id {
 				return &enclosure.Boxes[idx].Switches[s_idx], &enclosure.Boxes[idx]
 			}
 		}
 	}
 	return &m.Switch{}, &m.Box{}
+}
+
+func FindSwitchById(id string, box *m.Box) *m.Switch {
+	println(id)
+	println(box.Switches[0].ID)
+	for s_idx := range box.Switches {
+		if box.Switches[s_idx].ID == id {
+			return &box.Switches[s_idx]
+		}
+
+	}
+	return &m.Switch{}
 }
 func FindSensorById(id string, box *m.Box) *m.Sensor {
 	for idx := range box.Sensors {

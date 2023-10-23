@@ -20,6 +20,10 @@ definitions:
         items:
           $ref: '#/definitions/model.Sensor'
         type: array
+      switches:
+        items:
+          $ref: '#/definitions/model.Switch'
+        type: array
     type: object
   model.Enclosure:
     properties:
@@ -83,6 +87,23 @@ definitions:
     type: string
     x-enum-varnames:
     - TEMP
+  model.Switch:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      state:
+        type: boolean
+      type:
+        $ref: '#/definitions/model.SwitchType'
+    type: object
+  model.SwitchType:
+    enum:
+    - TASMOTA_MQTT
+    type: string
+    x-enum-varnames:
+    - TASMOTA_MQTT
   model.TimeSeries:
     properties:
       times:
@@ -103,8 +124,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve a fan object by its ID and the ID of the box it belongs
-        to
+      description: Get the details of a specific fan by its unique ID and the ID of
+        the box it belongs to.
       parameters:
       - description: Box ID
         in: path
@@ -120,21 +141,21 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved fan
           schema:
             $ref: '#/definitions/model.Fan'
         "400":
-          description: Bad Request
+          description: Invalid ID format or fan not found
           schema:
             type: string
-      summary: Get fan
+      summary: Retrieve a fan by its ID.
       tags:
       - fan
     post:
       consumes:
       - application/json
-      description: Update a fan object by its ID and the ID of the box it belongs
-        to
+      description: Update the information of a specific fan by its unique ID and the
+        ID of the box it belongs to.
       parameters:
       - description: Box ID
         in: path
@@ -146,7 +167,7 @@ paths:
         name: fanId
         required: true
         type: integer
-      - description: Fan object
+      - description: Fan object to update
         in: body
         name: body
         required: true
@@ -156,14 +177,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully updated fan
           schema:
             $ref: '#/definitions/model.Fan'
         "400":
-          description: Bad Request
+          description: Invalid payload format or fan not found
           schema:
             type: string
-      summary: Update fan
+      summary: Update a fan's information.
       tags:
       - fan
   /{boxId}/lights/{lightId}:
@@ -291,6 +312,73 @@ paths:
       summary: Get Sensor Data
       tags:
       - sensor
+  /{boxId}/switches/{switchId}:
+    get:
+      consumes:
+      - application/json
+      description: Get the details of a specific switch by its unique ID and the ID
+        of the box it belongs to.
+      parameters:
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Switch ID
+        in: path
+        name: switchId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved switch
+          schema:
+            $ref: '#/definitions/model.Switch'
+        "400":
+          description: Invalid ID format or switch not found
+          schema:
+            type: string
+      summary: Retrieve a switch by its ID.
+      tags:
+      - switch
+    post:
+      consumes:
+      - application/json
+      description: Update the state of a specific switch by its unique ID and the
+        ID of the box it belongs to.
+      parameters:
+      - description: Box ID
+        in: path
+        name: boxId
+        required: true
+        type: string
+      - description: Switch ID
+        in: path
+        name: switchId
+        required: true
+        type: string
+      - description: Switch object with new state
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Switch'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated switch
+          schema:
+            $ref: '#/definitions/model.Switch'
+        "400":
+          description: Invalid payload format or switch not found
+          schema:
+            type: string
+      summary: Update a switch's state.
+      tags:
+      - switch
   /enclosure:
     get:
       consumes:

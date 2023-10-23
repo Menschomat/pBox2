@@ -32,7 +32,7 @@
         },
         "/{boxId}/fans/{fanId}": {
             "get": {
-                "description": "Retrieve a fan object by its ID and the ID of the box it belongs to",
+                "description": "Get the details of a specific fan by its unique ID and the ID of the box it belongs to.",
                 "consumes": [
                     "application/json"
                 ],
@@ -42,7 +42,7 @@
                 "tags": [
                     "fan"
                 ],
-                "summary": "Get fan",
+                "summary": "Retrieve a fan by its ID.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -61,13 +61,13 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully retrieved fan",
                         "schema": {
                             "$ref": "#/definitions/model.Fan"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid ID format or fan not found",
                         "schema": {
                             "type": "string"
                         }
@@ -75,7 +75,7 @@
                 }
             },
             "post": {
-                "description": "Update a fan object by its ID and the ID of the box it belongs to",
+                "description": "Update the information of a specific fan by its unique ID and the ID of the box it belongs to.",
                 "consumes": [
                     "application/json"
                 ],
@@ -85,7 +85,7 @@
                 "tags": [
                     "fan"
                 ],
-                "summary": "Update fan",
+                "summary": "Update a fan's information.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -102,7 +102,7 @@
                         "required": true
                     },
                     {
-                        "description": "Fan object",
+                        "description": "Fan object to update",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -113,13 +113,13 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully updated fan",
                         "schema": {
                             "$ref": "#/definitions/model.Fan"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid payload format or fan not found",
                         "schema": {
                             "type": "string"
                         }
@@ -313,6 +313,103 @@
                     }
                 }
             }
+        },
+        "/{boxId}/switches/{switchId}": {
+            "get": {
+                "description": "Get the details of a specific switch by its unique ID and the ID of the box it belongs to.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "switch"
+                ],
+                "summary": "Retrieve a switch by its ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Box ID",
+                        "name": "boxId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Switch ID",
+                        "name": "switchId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved switch",
+                        "schema": {
+                            "$ref": "#/definitions/model.Switch"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID format or switch not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Update the state of a specific switch by its unique ID and the ID of the box it belongs to.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "switch"
+                ],
+                "summary": "Update a switch's state.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Box ID",
+                        "name": "boxId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Switch ID",
+                        "name": "switchId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Switch object with new state",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Switch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated switch",
+                        "schema": {
+                            "$ref": "#/definitions/model.Switch"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid payload format or switch not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -344,6 +441,12 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Sensor"
+                    }
+                },
+                "switches": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Switch"
                     }
                 }
             }
@@ -441,6 +544,32 @@
             ],
             "x-enum-varnames": [
                 "TEMP"
+            ]
+        },
+        "model.Switch": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.SwitchType"
+                }
+            }
+        },
+        "model.SwitchType": {
+            "type": "string",
+            "enum": [
+                "TASMOTA_MQTT"
+            ],
+            "x-enum-varnames": [
+                "TASMOTA_MQTT"
             ]
         },
         "model.TimeSeries": {
