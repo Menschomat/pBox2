@@ -14,6 +14,7 @@ var cfg = paresConfig(CFG_PATH)
 func paresConfig(path string) m.Configuration {
 	file, _ := ioutil.ReadFile(path)
 	data := m.Configuration{}
+	println([]byte(file))
 	_ = json.Unmarshal([]byte(file), &data)
 	return data
 }
