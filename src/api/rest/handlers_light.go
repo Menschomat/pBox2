@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Menschomat/pBox2/api/websocket"
 	_ "github.com/Menschomat/pBox2/docs"
 	m "github.com/Menschomat/pBox2/model"
 	u "github.com/Menschomat/pBox2/utils"
@@ -69,6 +70,7 @@ func UpdateLight(cfg *m.Configuration, mqttClient mqtt.Client) http.HandlerFunc 
 
 		light.Level = body.Level
 		mqttClient.Publish("test/"+box.ID+"/lights/"+light.ID, 0, false, strconv.Itoa(light.Level))
+		websocket.PublishLightEvent(cfg, box, light)
 		json.NewEncoder(w).Encode(light)
 	}
 }

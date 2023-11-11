@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Menschomat/pBox2/api/websocket"
 	_ "github.com/Menschomat/pBox2/docs"
 	m "github.com/Menschomat/pBox2/model"
 	u "github.com/Menschomat/pBox2/utils"
@@ -89,7 +90,7 @@ func UpdateFan(cfg *m.Configuration, mqttClient mqtt.Client) http.HandlerFunc {
 		// Validate or process the new fan level before publishing it.
 		topic := "test/" + box.ID + "/fans/" + fan.ID
 		mqttClient.Publish(topic, 0, false, strconv.Itoa(fan.Level))
-
+		websocket.PublishFanEvent(cfg, box, fan)
 		respondWithJSON(w, http.StatusOK, fan)
 	}
 }
