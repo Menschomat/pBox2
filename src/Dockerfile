@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build_dashboard
+FROM node:16-alpine AS build_dashboard
 WORKDIR /src/
 COPY web/ web/
 WORKDIR /src/web/
