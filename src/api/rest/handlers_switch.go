@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	api_mqtt "github.com/Menschomat/pBox2/api/mqtt"
+	"github.com/Menschomat/pBox2/api/websocket"
 	_ "github.com/Menschomat/pBox2/docs"
 	m "github.com/Menschomat/pBox2/model"
 	u "github.com/Menschomat/pBox2/utils"
@@ -76,7 +77,7 @@ func UpdateSwitch(cfg *m.Configuration, mqttClient mqtt.Client) http.HandlerFunc
 		topic := cfg.Mqtt.Tasmota.Topic + "/cmnd/" + switchID + "/POWER"
 		stateStr := api_mqtt.BoolToStr(switc.State)
 		mqttClient.Publish(topic, 0, false, stateStr)
-
+		websocket.PublishSwitchEvent(cfg, box, switc)
 		respondWithJSON(w, http.StatusOK, switc)
 	}
 }
