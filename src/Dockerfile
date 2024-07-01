@@ -1,11 +1,11 @@
-FROM node:16-alpine AS build_dashboard
+FROM node:18-alpine AS build_dashboard
 WORKDIR /src/
 COPY web/ web/
 WORKDIR /src/web/
 RUN npm install
 RUN npm run build
 
-FROM golang:1.21.3-alpine AS build_backend
+FROM golang:1.22.4-alpine AS build_backend
 WORKDIR /src/
 COPY *.go go.* /src/
 COPY docs/ /src/docs/
