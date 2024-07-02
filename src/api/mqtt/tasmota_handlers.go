@@ -21,7 +21,7 @@ func (c *MQTTClient) processTasmotaMessage(msg mqtt.Message) {
 		return
 	}
 
-	log.Printf("Received message from Tasmota topic: %s: %s\n", msg.Topic(), msg.Payload())
+	//log.Printf("Received message from Tasmota topic: %s: %s\n", msg.Topic(), msg.Payload())
 
 	topicParts, err := utils.ParseTopic(msg.Topic())
 	if err != nil {
@@ -45,7 +45,7 @@ func (c *MQTTClient) processTasmotaMessage(msg mqtt.Message) {
 	case "POWER":
 		c.handleSwitchEvent(switc, box, msg.Payload())
 	default:
-		log.Printf("Unhandled method: %s", method)
+		//log.Printf("Unhandled method: %s", method)
 	}
 }
 
