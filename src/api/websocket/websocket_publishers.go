@@ -18,6 +18,7 @@ func PublishSwitchEvent(cfg *model.Configuration, box *model.Box, switc *model.S
 			cfg.Enclosure.ID+"/"+box.ID,
 			model.SwitchEventBody{
 				ID:    switc.ID,
+				Name:  switc.Name,
 				State: switc.State,
 			},
 		),
@@ -37,6 +38,7 @@ func PublishLightEvent(cfg *model.Configuration, box *model.Box, light *model.Li
 			cfg.Enclosure.ID+"/"+box.ID,
 			model.LightEventBody{
 				ID:    light.ID,
+				Name:  light.Name,
 				Level: light.Level,
 			},
 		),
@@ -56,6 +58,7 @@ func PublishFanEvent(cfg *model.Configuration, box *model.Box, fan *model.Fan) {
 			cfg.Enclosure.ID+"/"+box.ID,
 			model.FanEventBody{
 				ID:    fan.ID,
+				Name:  fan.Name,
 				Level: fan.Level,
 			},
 		),

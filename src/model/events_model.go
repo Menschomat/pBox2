@@ -47,6 +47,7 @@ type SwitchEvent struct {
 }
 type SwitchEventBody struct {
 	ID    string `json:"id"`
+	Name  string `json:"name"`
 	State bool   `json:"state"`
 }
 
@@ -64,6 +65,7 @@ type LightEvent struct {
 }
 type LightEventBody struct {
 	ID    string `json:"id"`
+	Name  string `json:"name"`
 	Level int    `json:"value"`
 }
 
@@ -81,6 +83,7 @@ type FanEvent struct {
 }
 type FanEventBody struct {
 	ID    string `json:"id"`
+	Name  string `json:"name"`
 	Level int    `json:"value"`
 }
 
